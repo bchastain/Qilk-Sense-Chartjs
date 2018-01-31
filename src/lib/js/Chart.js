@@ -8908,7 +8908,7 @@ module.exports = function(Chart) {
 	// Private helper to create a tooltip item model
 	// @param element : the chart element (point, arc, bar) to create the tooltip item for
 	// @return : new tooltip item
-	function createTooltipItem(element) {
+	function createTooltipItem(element, total) {
 		var xScale = element._xScale;
 		var yScale = element._yScale || element._scale; // handle radar || polarArea charts
 		var index = element._index,
@@ -8920,7 +8920,8 @@ module.exports = function(Chart) {
 			index: index,
 			datasetIndex: datasetIndex,
 			x: element._model.x,
-			y: element._model.y
+			y: element._model.y,
+			yTotal: total
 		};
 	}
 
@@ -9243,6 +9244,14 @@ module.exports = function(Chart) {
 		update: function(changed) {
 			var me = this;
 			var opts = me._options;
+			if (window.layout) {
+				if (window.layout[me._chart.canvas.id]) {
+					var layout = window.layout[me._chart.canvas.id];
+					if (layout.placement) {
+						opts.position = "nearest";
+					}
+				}
+			}
 
 			// Need to regenerate the model because its faster than using extend and it is necessary due to the optimization in Chart.Element.transition
 			// that does _view = _model if ease === 1. This causes the 2nd tooltip update to set properties in both the view and model at the same time
@@ -9281,8 +9290,12 @@ module.exports = function(Chart) {
 				tooltipPosition = Chart.Tooltip.positioners[opts.position](active, me._eventPosition);
 
 				var tooltipItems = [];
+				var total = 0;
+				helpers.each(data.datasets, function(dataset) {
+					total += dataset.data[active[0]._index]
+				});
 				for (i = 0, len = active.length; i < len; ++i) {
-					tooltipItems.push(createTooltipItem(active[i]));
+					tooltipItems.push(createTooltipItem(active[i], total));
 				}
 
 				// If the user provided a filter function, use it to modify the tooltip items

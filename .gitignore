@@ -113,3 +113,4 @@ $RECYCLE.BIN/
 
 # Mac crap
 .DS_Store
+package-lock.json

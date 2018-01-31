@@ -39,6 +39,63 @@ define([
             options: chart_options,
             defaultValue: 1
           },
+          ToolTips: {
+            type: "items",
+            label: "Tool Tips",
+            items: {
+              placement: {
+                type: "boolean",
+                component: "switch",
+                label: "Tool tip placement",
+                ref: "placement",
+                defaultValue: false,
+                options: [
+                  { value: false, label: "Center"},
+                  { value: true, label: "Nearest to Cursor"}
+                ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1
+                    || (data.qHyperCubeDef.qDimensions.length == 1 
+                        && data.qHyperCubeDef.qMeasures.length > 1
+                  )); 
+                }
+              },
+              hidezero: {
+                type: "boolean",
+                component: "switch",
+                label: "Hide Zeroes",
+                ref: "hidezero",
+                defaultValue: false,
+                options: [
+                  { value: false, label: "Show Categories with 0"},
+                  { value: true, label: "Hide Categories with 0"}
+                ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1
+                    || (data.qHyperCubeDef.qDimensions.length == 1 
+                        && data.qHyperCubeDef.qMeasures.length > 1
+                  )); 
+                }
+              },
+              normalized: {
+                type: "boolean",
+                component: "switch",
+                label: "Show % of Total",
+                ref: "normalized",
+                defaultValue: false,
+                options: [
+                  { value: false, label: "No"},
+                  { value: true, label: "Yes"}
+                ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1
+                    || (data.qHyperCubeDef.qDimensions.length == 1 
+                        && data.qHyperCubeDef.qMeasures.length > 1
+                  )); 
+                }
+              }
+            }
+          },
           ChartSettings: {
           	type: "items",
           	label: "Chart Settings",

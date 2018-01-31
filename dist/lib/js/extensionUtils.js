@@ -1,1 +1,20 @@
-define(["jquery","underscore"],function(e,n){"use strict";return{addStyleToHeader:function(n){e("<style>").html(n).appendTo("head")}}});
+/*global define*/
+define( [
+  'jquery',
+  'underscore'
+], function ($,_) {
+'use strict';
+
+  return {
+
+    /**
+     * Add a style to the document's header.
+     * @param cssContent (String)
+     */
+    addStyleToHeader: function ( cssContent ) {
+      $("<style>").html(cssContent).appendTo("head");
+    }
+
+  };
+
+} );

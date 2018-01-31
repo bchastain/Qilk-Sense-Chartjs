@@ -1,1 +1,99 @@
-var visualize=function(e,a,t,l){var o=a.qInfo.qId+"_chartjs_bar",i=l.calculateMargin(e,a),n=i[0],s=i[1],r=[],c=0;"auto"==a.colors?(r=l.defineColorPalette("palette"),c=a.color):r=a.custom_colors.split("-");var u="rgba("+r[c]+","+a.opacity+")";e.html('<canvas id="'+o+'" width="'+n+'" height="'+s+'"></canvas>');var d=a.qHyperCube.qDataPages[0].qMatrix;a.cumulative&&(d=l.addCumulativeValues(d));var b=document.getElementById(o);new Chart(b,{type:"bar",data:{labels:d.map(function(e){return e[0].qText}),datasets:[{label:a.qHyperCube.qMeasureInfo[0].qFallbackTitle,data:d.map(function(e){return e[1].qNum}),backgroundColor:u,borderColor:u,borderWidth:1}]},options:{title:{display:a.title_switch,text:a.title},legend:{display:"hide"!=a.legend_position,position:a.legend_position,onClick:function(e,a){}},scales:{xAxes:[{scaleLabel:{display:a.datalabel_switch,labelString:a.qHyperCube.qDimensionInfo[0].qFallbackTitle}}],yAxes:[{scaleLabel:{display:a.datalabel_switch,labelString:a.qHyperCube.qMeasureInfo[0].qFallbackTitle},ticks:{beginAtZero:!0,callback:function(e,t,o){return l.formatMeasure(e,a,0)}}}]},tooltips:{mode:"label",callbacks:{label:function(e,t){return t.datasets[e.datasetIndex].label+": "+l.formatMeasure(e.yLabel,a,0)}}},responsive:!0,events:["mousemove","mouseout","click","touchstart","touchmove","touchend"],onClick:function(e){var a=this.getElementsAtEvent(e);a.length>0&&l.makeSelectionsOnDataPoints(d[a[0]._index][0].qElemNumber,t)}}})};
+var visualize = function($element, layout, _this, chartjsUtils) {
+  var id  = layout.qInfo.qId + "_chartjs_bar";
+
+  var width_height = chartjsUtils.calculateMargin($element, layout);
+  var width = width_height[0], height = width_height[1];
+
+  var palette = [];
+  var layout_color = 0;
+  if (layout.colors == "auto") {
+    palette = chartjsUtils.defineColorPalette("palette");
+    layout_color = layout.color;
+  } else {
+    palette = layout.custom_colors.split("-");
+  }
+  var color = "rgba(" + palette[layout_color] + "," + layout.opacity + ")"
+
+  //$element.empty();
+  $element.html('<canvas id="' + id + '" width="' + width + '" height="'+ height + '"></canvas>');
+
+  var data = layout.qHyperCube.qDataPages[0].qMatrix;
+
+  if (layout.cumulative) {
+    data = chartjsUtils.addCumulativeValues(data);
+  }
+
+  var ctx = document.getElementById(id);
+
+  var myChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+          labels: data.map(function(d) { return d[0].qText; }),
+          datasets: [{
+              label: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle,
+              data: data.map(function(d) { return d[1].qNum; }),
+              backgroundColor: color,
+              borderColor: color,
+              borderWidth: 1
+          }]
+      },
+      options: {
+        title:{
+            display: layout.title_switch,
+            text: layout.title
+        },
+        legend: {
+          display: (layout.legend_position == "hide") ? false : true,
+          position: layout.legend_position,
+          onClick: function(evt, legendItem) {
+            //do nothing
+          }
+        },
+        scales: {
+          xAxes: [{
+            scaleLabel: {
+              display: layout.datalabel_switch,
+              labelString: layout.qHyperCube.qDimensionInfo[0].qFallbackTitle
+            }
+          }],
+          yAxes: [{
+            scaleLabel: {
+              display: layout.datalabel_switch,
+              labelString: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle
+            },
+            ticks: {
+              beginAtZero: layout.begin_at_zero_switch,
+              callback: function(value, index, values) {
+                return chartjsUtils.formatMeasure(value, layout, 0);
+              }
+            }
+          }]
+        },
+        tooltips: {
+            mode: 'label',
+            callbacks: {
+                label: function(tooltipItems, data) {
+                    return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+                }
+            }
+        },
+        responsive: true,
+        events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
+        onClick: function(evt) {
+          var activePoints = this.getElementsAtEvent(evt);
+          if(activePoints.length > 0) {
+            chartjsUtils.makeSelectionsOnDataPoints(data[activePoints[0]._index][0].qElemNumber, _this);
+          }
+        }
+      }
+      // options: {
+      //     scales: {
+      //         yAxes: [{
+      //             ticks: {
+      //                 beginAtZero:true
+      //             }
+      //         }]
+      //     }
+      // }
+  });
+}

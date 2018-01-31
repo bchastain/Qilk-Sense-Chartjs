@@ -1,1 +1,144 @@
-var visualize=function(e,t,a,o){var l=t.qInfo.qId+"_chartjs_stacked_bar",i=o.calculateMargin(e,t),s=i[0],n=i[1];e.html('<canvas id="'+l+'" width="'+s+'" height="'+n+'"></canvas>');var r=[];r="auto"==t.colors?o.defineColorPalette(t.color_selection):t.custom_colors.split("-");var c=t.qHyperCube.qDataPages[0].qMatrix,u=o.flattenData(c),d=u[0],b=u[1],m=u[2];t.sort&&b.sort();var p=_.groupBy(d,"dim1"),h=[];h.dim1=[],h.dim1_elem=[],h=o.initializeArrayWithZero(_.size(p),b,h),h=o.storeHypercubeDataToArray(p,h),t.cumulative&&(h=o.addCumulativeValuesOnTwoDimensions(b,h));for(var v=[],g=0;g<b.length;g++){var y=[],f=g;"auto"==t.colors&&"twelve"==t.color_selection?f=g%12:"auto"==t.colors&&"one-handred"==t.color_selection?f=g%100:"custom"==t.colors&&(f=g%r.length),y.label=b[g],y.backgroundColor="rgba("+r[f]+","+t.opacity+")",y.data=h[b[g]],y.fill=t.background_color_switch,y.borderColor="rgba("+r[f]+","+t.opacity+")",y.pointBackgroundColor="#FFFFFF",y.pointRadius=t.point_radius_size,v.push(y)}var k={labels:h.dim1,datasets:v},q=document.getElementById(l);new Chart(q,{type:"line",data:k,options:{title:{display:t.title_switch,text:t.title},legend:{display:"hide"!=t.legend_position,position:t.legend_position,onClick:function(e,t){var o=[],l=1;m[t.text]<0||(o.push(m[t.text]),a.selectValues(l,o,!0))}},scales:{xAxes:[{scaleLabel:{display:t.datalabel_switch,labelString:t.qHyperCube.qDimensionInfo[0].qFallbackTitle}}],yAxes:[{scaleLabel:{display:t.datalabel_switch,labelString:t.qHyperCube.qMeasureInfo[0].qFallbackTitle},ticks:{beginAtZero:!0,callback:function(e,a,l){return o.formatMeasure(e,t,0)}}}]},tooltips:{mode:"label",callbacks:{label:function(e,a){return a.datasets[e.datasetIndex].label+": "+o.formatMeasure(e.yLabel,t,0)}}},responsive:!0,events:["mousemove","mouseout","click","touchstart","touchmove","touchend"],onClick:function(e){var t=this.getElementsAtEvent(e);t.length>0&&o.makeSelectionsOnDataPoints(h.dim1_elem[t[0]._index],a)}}})};
+var visualize = function($element, layout, _this, chartjsUtils) {
+  var id  = layout.qInfo.qId + "_chartjs_stacked_bar";
+
+  var width_height = chartjsUtils.calculateMargin($element, layout);
+  var width = width_height[0], height = width_height[1];
+
+  //$element.empty();
+  $element.html('<canvas id="' + id + '" width="' + width + '" height="'+ height + '"></canvas>');
+
+  var palette = [];
+  if (layout.colors == "auto") {
+    palette = chartjsUtils.defineColorPalette(layout.color_selection);
+  } else {
+    palette = layout.custom_colors.split("-");
+  }
+
+  var qMatrix = layout.qHyperCube.qDataPages[0].qMatrix;
+
+  var result_set = chartjsUtils.flattenData(qMatrix);
+  var flatten_data = result_set[0];
+  var dim2_unique_values = result_set[1];
+  var dim2_unique_elem_nums = result_set[2];
+
+  // Sort by Alphabetic order
+  if (layout.sort) {
+    dim2_unique_values.sort()
+  }
+
+  //Group by dimension1
+  var data_grouped_by_dim1 = _.groupBy(flatten_data, 'dim1')
+
+  //Create a container for result
+  var formatted_data_array = [];
+  formatted_data_array["dim1"] = [];
+  formatted_data_array["dim1_elem"] = [];
+
+  // Initialize arrays for dimension values
+   formatted_data_array = chartjsUtils.initializeArrayWithZero(_.size(data_grouped_by_dim1), dim2_unique_values, formatted_data_array);
+
+   // Store hypercube data to formatted_data_array
+   formatted_data_array = chartjsUtils.storeHypercubeDataToArray(data_grouped_by_dim1, formatted_data_array);
+
+  // Culculate cumulative sum when cumulative switch is on
+  if (layout.cumulative) {
+    formatted_data_array = chartjsUtils.addCumulativeValuesOnTwoDimensions(dim2_unique_values, formatted_data_array);
+  }
+
+  // Create datasets for Chart.js rendering
+  var datasets = [];
+  for(var i=0; i<dim2_unique_values.length; i++ ) {
+    var subdata = [];
+    var color_id = i;
+    if (layout.colors == "auto" && layout.color_selection == "twelve") {
+      color_id = i % 12
+    } else if (layout.colors == "auto" && layout.color_selection == "one-handred") {
+      color_id = i % 100
+    } else if (layout.colors == "custom") {
+      color_id = i % palette.length
+    } else {}
+    subdata.label = dim2_unique_values[i];
+    subdata.backgroundColor = "rgba(" + palette[color_id] + "," + layout.opacity + ")";
+    subdata.data = formatted_data_array[dim2_unique_values[i]];
+    subdata.fill = layout.background_color_switch;
+    subdata.borderColor = "rgba(" + palette[color_id] + "," + layout.opacity + ")";
+    subdata.pointBackgroundColor = "#FFFFFF";
+    subdata.pointRadius = layout.point_radius_size;
+    datasets.push(subdata);
+  }
+
+  var chart_data = {
+      labels: formatted_data_array["dim1"],
+      datasets: datasets
+  };
+
+  var ctx = document.getElementById(id);
+  var myStackedBar = new Chart(ctx, {
+      type: 'line',
+      data: chart_data,
+      options: {
+          title:{
+              display: layout.title_switch,
+              text: layout.title
+          },
+          legend: {
+            display: (layout.legend_position == "hide") ? false : true,
+            position: layout.legend_position,
+            onClick: function(evt, legendItem) {
+              var values = [];
+              var dim = 1;
+              if(dim2_unique_elem_nums[legendItem.text]<0) {
+                //do nothing
+              } else {
+                values.push(dim2_unique_elem_nums[legendItem.text]);
+                _this.selectValues(dim, values, true);
+              }
+            }
+          },
+          scales: {
+            xAxes: [{
+              scaleLabel: {
+                display: layout.datalabel_switch,
+                labelString: layout.qHyperCube.qDimensionInfo[0].qFallbackTitle
+              }
+            }],
+            yAxes: [{
+              scaleLabel: {
+                display: layout.datalabel_switch,
+                labelString: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle
+              },
+              ticks: {
+                beginAtZero: layout.begin_at_zero_switch,
+                callback: function(value, index, values) {
+                  return chartjsUtils.formatMeasure(value, layout, 0);
+                }
+              }
+            }]
+          },
+          tooltips: {
+              mode: 'label',
+              callbacks: {
+                  label: function(tooltipItems, data) {
+                      return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+                  }
+              }
+          },
+          responsive: true,
+          // scales: {
+          //     xAxes: [{
+          //         stacked: true,
+          //     }],
+          //     yAxes: [{
+          //         stacked: true
+          //     }]
+          // },
+          events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
+          onClick: function(evt) {
+              var activePoints = this.getElementsAtEvent(evt);
+              if(activePoints.length > 0) {
+                chartjsUtils.makeSelectionsOnDataPoints(formatted_data_array["dim1_elem"][activePoints[0]._index], _this);
+              }
+          }
+      }
+  });
+}

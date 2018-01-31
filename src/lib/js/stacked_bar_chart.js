@@ -1,5 +1,11 @@
 var visualize = function($element, layout, _this, chartjsUtils) {
   var id  = layout.qInfo.qId + "_chartjs_stacked_bar";
+  if(window.layout) {
+    window.layout[id] = layout;
+  } else {
+    window.layout = {};
+    window.layout[id] = layout;
+  }
 
   var width_height = chartjsUtils.calculateMargin($element, layout);
   var width = width_height[0], height = width_height[1];
@@ -121,7 +127,14 @@ var visualize = function($element, layout, _this, chartjsUtils) {
               mode: 'label',
               callbacks: {
                   label: function(tooltipItems, data) {
-                      return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+                      if ((layout.hidezero && tooltipItems.yLabel > 0) || !layout.hidezero) {
+                        if (layout.normalized) {
+                          return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0) + ' (' + (100*tooltipItems.yLabel/tooltipItems.yTotal).toFixed(1) + '%)';
+                        } else {
+                          return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+                        }
+                        
+                      }
                   }
               }
           },

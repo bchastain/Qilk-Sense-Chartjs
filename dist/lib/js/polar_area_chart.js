@@ -1,1 +1,105 @@
-var visualize=function(e,t,a,o){var l=t.qInfo.qId+"_chartjs_bar",n=o.calculateMargin(e,t),i=n[0],r=n[1];e.html('<canvas id="'+l+'" width="'+i+'" height="'+r+'"></canvas>');var s=[];s="auto"==t.colors?o.defineColorPalette(t.color_selection):t.custom_colors.split("-");var c=t.qHyperCube.qDataPages[0].qMatrix,u=12;"auto"==t.colors&&"one-handred"==t.color_selection?u=100:"custom"==t.colors&&(u=s.length);var d=c.map(function(e,a){return"rgba("+s[a%u]+","+t.opacity+")"});t.cumulative&&(c=o.addCumulativeValues(c));var m=document.getElementById(l);new Chart(m,{type:"polarArea",data:{labels:c.map(function(e){return e[0].qText}),datasets:[{label:t.qHyperCube.qMeasureInfo[0].qFallbackTitle,fill:t.background_color_switch,data:c.map(function(e){return e[1].qNum}),backgroundColor:d,borderColor:d,pointBackgroundColor:d,borderWidth:1,pointRadius:t.point_radius_size}]},options:{title:{display:t.title_switch,text:t.title},legend:{display:"hide"!=t.legend_position,position:t.legend_position,onClick:function(e,t){var o=[],l=0;c[t.index][0].qElemNumber<0||(o.push(c[t.index][0].qElemNumber),a.selectValues(l,o,!0))}},scale:{ticks:{beginAtZero:!0,callback:function(e,a,l){return o.formatMeasure(e,t,0)}}},tooltips:{mode:"label",callbacks:{label:function(e,a){return a.datasets[e.datasetIndex].label+": "+o.formatMeasure(e.yLabel,t,0)}}},responsive:!0,events:["mousemove","mouseout","click","touchstart","touchmove","touchend"],onClick:function(e){var t=this.getElementsAtEvent(e);t.length>0&&o.makeSelectionsOnDataPoints(c[t[0]._index][0].qElemNumber,a)}}})};
+var visualize = function($element, layout, _this, chartjsUtils) {
+  var id  = layout.qInfo.qId + "_chartjs_bar";
+
+  var width_height = chartjsUtils.calculateMargin($element, layout);
+  var width = width_height[0], height = width_height[1];
+
+  //$element.empty();
+  $element.html('<canvas id="' + id + '" width="' + width + '" height="'+ height + '"></canvas>');
+
+  var palette = [];
+  if (layout.colors == "auto") {
+    palette = chartjsUtils.defineColorPalette(layout.color_selection);
+  } else {
+    palette = layout.custom_colors.split("-");
+  }
+
+  var data = layout.qHyperCube.qDataPages[0].qMatrix;
+
+  var color_count = 12;
+  if(layout.colors == "auto" && layout.color_selection == "one-handred") {
+    color_count = 100;
+  } else if (layout.colors == "custom") {
+    color_count = palette.length;
+  }
+  var palette_r = data.map(function(d, index) {
+    return "rgba(" + palette[index%color_count] + "," + layout.opacity + ")";
+  })
+
+
+  if (layout.cumulative) {
+    data = chartjsUtils.addCumulativeValues(data);
+  }
+
+  var ctx = document.getElementById(id);
+
+  var myRadarChart = new Chart(ctx, {
+      type: 'polarArea',
+      data: {
+          labels: data.map(function(d) { return d[0].qText; }),
+          datasets: [{
+              label: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle,
+              fill: layout.background_color_switch,
+              data: data.map(function(d) { return d[1].qNum; }),
+              backgroundColor: palette_r,
+              borderColor: palette_r,
+              pointBackgroundColor: palette_r,
+              borderWidth: 1,
+              pointRadius: layout.point_radius_size
+          }]
+      },
+      options: {
+        title:{
+            display: layout.title_switch,
+            text: layout.title
+        },
+        legend: {
+          display: (layout.legend_position == "hide") ? false : true,
+          position: layout.legend_position,
+          onClick: function(evt, legendItem) {
+            var values = [];
+            var dim = 0;
+            if(data[legendItem.index][0].qElemNumber<0) {
+              //do nothing
+            } else {
+              values.push(data[legendItem.index][0].qElemNumber);
+              _this.selectValues(dim, values, true);
+            }
+          }
+        },
+        scale: {
+          ticks: {
+            beginAtZero: layout.begin_at_zero_switch,
+            callback: function(value, index, values) {
+              return chartjsUtils.formatMeasure(value, layout, 0);
+            }
+          }
+        },
+        tooltips: {
+            mode: 'label',
+            callbacks: {
+                label: function(tooltipItems, data) {
+                    return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+                }
+            }
+        },
+        responsive: true,
+        events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
+        onClick: function(evt) {
+          var activePoints = this.getElementsAtEvent(evt);
+          if(activePoints.length > 0) {
+            chartjsUtils.makeSelectionsOnDataPoints(data[activePoints[0]._index][0].qElemNumber, _this);
+          }
+        }
+      }
+      // options: {
+      //     scales: {
+      //         yAxes: [{
+      //             ticks: {
+      //                 beginAtZero:true
+      //             }
+      //         }]
+      //     }
+      // }
+  });
+}

@@ -1,1 +1,124 @@
-var visualize=function(e,t,o,a){var l=t.qInfo.qId+"_chartjs_stacked_bar",i=a.calculateMargin(e,t),r=i[0],s=i[1];e.html('<canvas id="'+l+'" width="'+r+'" height="'+s+'"></canvas>');var n=[];n="auto"==t.colors?a.defineColorPalette(t.color_selection):t.custom_colors.split("-");var c=t.qHyperCube.qDataPages[0].qMatrix,u=a.flattenData(c),d=u[0],m=u[1],v=u[2];t.sort&&m.sort();var h=_.groupBy(d,"dim1"),p=[];p.dim1=[],p.dim1_elem=[],p=a.initializeArrayWithZero(_.size(h),m,p),p=a.storeHypercubeDataToArray(h,p),t.cumulative&&(p=a.addCumulativeValuesOnTwoDimensions(m,p));for(var g=[],b=0;b<m.length;b++){var f=[],y=b;"auto"==t.colors&&"twelve"==t.color_selection?y=b%12:"auto"==t.colors&&"one-handred"==t.color_selection?y=b%100:"custom"==t.colors&&(y=b%n.length),f.label=m[b],f.backgroundColor="rgba("+n[y]+","+t.opacity+")",f.data=p[m[b]],f.fill=t.background_color_switch,f.borderColor="rgba("+n[y]+","+t.opacity+")",f.pointBackgroundColor="#FFFFFF",f.pointRadius=t.point_radius_size,g.push(f)}var k={labels:p.dim1,datasets:g},C=document.getElementById(l);new Chart(C,{type:"radar",data:k,options:{title:{display:t.title_switch,text:t.title},legend:{display:"hide"!=t.legend_position,position:t.legend_position,onClick:function(e,t){var a=[],l=1;v[t.text]<0||(a.push(v[t.text]),o.selectValues(l,a,!0))}},scale:{ticks:{beginAtZero:!0,callback:function(e,o,l){return a.formatMeasure(e,t,0)}}},tooltips:{mode:"label",callbacks:{label:function(e,o){return o.datasets[e.datasetIndex].label+": "+a.formatMeasure(e.yLabel,t,0)}}},responsive:!0,events:["mousemove","mouseout","click","touchstart","touchmove","touchend"],onClick:function(e){var t=this.getElementsAtEvent(e);t.length>0&&a.makeSelectionsOnDataPoints(p.dim1_elem[t[0]._index],o)}}})};
+var visualize = function($element, layout, _this, chartjsUtils) {
+  var id  = layout.qInfo.qId + "_chartjs_stacked_bar";
+
+  var width_height = chartjsUtils.calculateMargin($element, layout);
+  var width = width_height[0], height = width_height[1];
+
+  //$element.empty();
+  $element.html('<canvas id="' + id + '" width="' + width + '" height="'+ height + '"></canvas>');
+
+  var palette = [];
+  if (layout.colors == "auto") {
+    palette = chartjsUtils.defineColorPalette(layout.color_selection);
+  } else {
+    palette = layout.custom_colors.split("-");
+  }
+
+  var qMatrix = layout.qHyperCube.qDataPages[0].qMatrix;
+
+  var result_set = chartjsUtils.flattenData(qMatrix);
+  var flatten_data = result_set[0];
+  var dim2_unique_values = result_set[1];
+  var dim2_unique_elem_nums = result_set[2];
+
+  // Sort by Alphabetic order
+  if (layout.sort) {
+    dim2_unique_values.sort()
+  }
+  //Group by dimension1
+  var data_grouped_by_dim1 = _.groupBy(flatten_data, 'dim1')
+
+  //Create a container for result
+  var formatted_data_array = [];
+  formatted_data_array["dim1"] = [];
+  formatted_data_array["dim1_elem"] = [];
+
+  // Initialize arrays for dimension values
+   formatted_data_array = chartjsUtils.initializeArrayWithZero(_.size(data_grouped_by_dim1), dim2_unique_values, formatted_data_array);
+
+   // Store hypercube data to formatted_data_array
+   formatted_data_array = chartjsUtils.storeHypercubeDataToArray(data_grouped_by_dim1, formatted_data_array);
+
+  // Culculate cumulative sum when cumulative switch is on
+  if (layout.cumulative) {
+    formatted_data_array = chartjsUtils.addCumulativeValuesOnTwoDimensions(dim2_unique_values, formatted_data_array);
+  }
+
+  // Create datasets for Chart.js rendering
+  var datasets = [];
+  for(var i=0; i<dim2_unique_values.length; i++ ) {
+    var subdata = [];
+    var color_id = i;
+    if (layout.colors == "auto" && layout.color_selection == "twelve") {
+      color_id = i % 12
+    } else if (layout.colors == "auto" && layout.color_selection == "one-handred") {
+      color_id = i % 100
+    } else if (layout.colors == "custom") {
+      color_id = i % palette.length
+    } else {}
+    subdata.label = dim2_unique_values[i];
+    //subdata.label = "test"
+    subdata.backgroundColor = "rgba(" + palette[color_id] + "," + layout.opacity + ")";
+    subdata.data = formatted_data_array[dim2_unique_values[i]];
+    subdata.fill = layout.background_color_switch;
+    subdata.borderColor = "rgba(" + palette[color_id] + "," + layout.opacity + ")";
+    subdata.pointBackgroundColor = "#FFFFFF";
+    subdata.pointRadius = layout.point_radius_size;
+    datasets.push(subdata);
+  }
+
+  var chart_data = {
+      labels: formatted_data_array["dim1"],
+      datasets: datasets
+  };
+
+  var ctx = document.getElementById(id);
+  var myMultipleRadar = new Chart(ctx, {
+      type: 'radar',
+      data: chart_data,
+      options: {
+          title:{
+              display: layout.title_switch,
+              text: layout.title
+          },
+          legend: {
+            display: (layout.legend_position == "hide") ? false : true,
+            position: layout.legend_position,
+            onClick: function(evt, legendItem) {
+              var values = [];
+              var dim = 1;
+              if(dim2_unique_elem_nums[legendItem.text]<0) {
+                //do nothing
+              } else {
+                values.push(dim2_unique_elem_nums[legendItem.text]);
+                _this.selectValues(dim, values, true);
+              }
+            }
+          },
+          scale: {
+            ticks: {
+              beginAtZero: layout.begin_at_zero_switch,
+              callback: function(value, index, values) {
+                return chartjsUtils.formatMeasure(value, layout, 0);
+              }
+            }
+          },
+          tooltips: {
+              mode: 'label',
+              callbacks: {
+                  label: function(tooltipItems, data) {
+                      return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+                  }
+              }
+          },
+          responsive: true,
+          events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
+          onClick: function(evt) {
+            var activePoints = this.getElementsAtEvent(evt);
+            if(activePoints.length > 0) {
+              chartjsUtils.makeSelectionsOnDataPoints(formatted_data_array["dim1_elem"][activePoints[0]._index], _this);
+            }
+          }
+      }
+  });
+}
