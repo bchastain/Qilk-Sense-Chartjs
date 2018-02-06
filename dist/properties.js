@@ -41,7 +41,7 @@ define([
           },
           ToolTips: {
             type: "items",
-            label: "Tool Tips",
+            label: "Custom EPA Settings",
             items: {
               placement: {
                 type: "boolean",
@@ -63,12 +63,29 @@ define([
               hidezero: {
                 type: "boolean",
                 component: "switch",
-                label: "Hide Zeroes",
+                label: "Hide Zeroes on Tooltips",
                 ref: "hidezero",
                 defaultValue: false,
                 options: [
                   { value: false, label: "Show Categories with 0"},
                   { value: true, label: "Hide Categories with 0"}
+                ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1
+                    || (data.qHyperCubeDef.qDimensions.length == 1 
+                        && data.qHyperCubeDef.qMeasures.length > 1
+                  )); 
+                }
+              },
+              showgridlines: {
+                type: "boolean",
+                component: "switch",
+                label: "Show Gridlines",
+                ref: "showgridlines",
+                defaultValue: true,
+                options: [
+                  { value: false, label: "No"},
+                  { value: true, label: "Yes"}
                 ],
                 show: function(data) { 
                   return (data.qHyperCubeDef.qDimensions.length > 1
@@ -87,6 +104,46 @@ define([
                   { value: false, label: "No"},
                   { value: true, label: "Yes"}
                 ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1
+                    || (data.qHyperCubeDef.qDimensions.length == 1 
+                        && data.qHyperCubeDef.qMeasures.length > 1
+                  )); 
+                }
+              },
+              tooltippct: {
+                type: "boolean",
+                component: "switch",
+                label: "Show % on Tooltip",
+                ref: "tooltippct",
+                defaultValue: false,
+                options: [
+                  { value: false, label: "No"},
+                  { value: true, label: "Yes"}
+                ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1
+                    || (data.qHyperCubeDef.qDimensions.length == 1 
+                        && data.qHyperCubeDef.qMeasures.length > 1
+                  )); 
+                }
+              },
+              numticks: {
+                type: "number",
+                component: "dropdown",
+                label: "Measure Tick Spacing",
+                ref: "numticks",
+                options: [{
+                  value: 3,
+                  label: "Wide"
+                }, {
+                  value: 6,
+                  label: "Medium"
+                }, {
+                  value: 10,
+                  label: "Narrow"
+                }],
+                defaultValue:10,
                 show: function(data) { 
                   return (data.qHyperCubeDef.qDimensions.length > 1
                     || (data.qHyperCubeDef.qDimensions.length == 1 

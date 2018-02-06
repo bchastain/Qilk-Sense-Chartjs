@@ -1,5 +1,5 @@
 {
-	"name" : "Qlik-Sense-Chartjs",
+	"name" : "Qlik-Sense-Chartjs_EPA",
 	"description" : "Qlik Sense Extension using Chart.js(http://www.chartjs.org/).",
 	"icon" : "extension",
 	"type" : "visualization",

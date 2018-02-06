@@ -7569,6 +7569,7 @@ module.exports = function(Chart) {
 
 	var helpers = Chart.helpers;
 
+
 	Chart.defaults.scale = {
 		display: true,
 		position: 'left',
@@ -8062,6 +8063,13 @@ module.exports = function(Chart) {
 			var maxTicks;
 			if (optionTicks.maxTicksLimit) {
 				maxTicks = optionTicks.maxTicksLimit;
+			} else if (window.layout) {
+				if (window.layout[me.chart.chart.canvas.id]) {
+					var layout = window.layout[me.chart.chart.canvas.id];
+					if (layout.numticks) {
+						maxTicks = layout.numticks;
+					}
+				}
 			}
 
 			var tickFontColor = helpers.getValueOrDefault(optionTicks.fontColor, globalDefaults.defaultFontColor);
@@ -8219,6 +8227,14 @@ module.exports = function(Chart) {
 
 			// Draw all of the tick labels, tick marks, and grid lines at the correct places
 			helpers.each(itemsToDraw, function(itemToDraw) {
+				if (window.layout) {
+					if (window.layout[me.chart.chart.canvas.id]) {
+						var layout = window.layout[me.chart.chart.canvas.id];
+						if (layout.hasOwnProperty('showgridlines')) {
+							gridLines.display = layout.showgridlines;
+						}
+					}
+				}
 				if (gridLines.display) {
 					context.save();
 					context.lineWidth = itemToDraw.glWidth;
@@ -9292,7 +9308,7 @@ module.exports = function(Chart) {
 				var tooltipItems = [];
 				var total = 0;
 				helpers.each(data.datasets, function(dataset) {
-					total += dataset.data[active[0]._index]
+					total += dataset.orig_data[active[0]._index]
 				});
 				for (i = 0, len = active.length; i < len; ++i) {
 					tooltipItems.push(createTooltipItem(active[i], total));
@@ -10912,6 +10928,14 @@ module.exports = function(Chart) {
 				var tickFontSize = helpers.getValueOrDefault(tickOpts.fontSize, Chart.defaults.global.defaultFontSize);
 				maxTicks = Math.min(tickOpts.maxTicksLimit ? tickOpts.maxTicksLimit : 11, Math.ceil(me.height / (2 * tickFontSize)));
 			}
+			if (window.layout) {
+				if (window.layout[me.chart.chart.canvas.id]) {
+					var layout = window.layout[me.chart.chart.canvas.id];
+					if (layout.numticks) {
+						maxTicks = layout.numticks;
+					}
+				}
+			}
 
 			return maxTicks;
 		},
@@ -10923,7 +10947,7 @@ module.exports = function(Chart) {
 			}
 		},
 		getLabelForIndex: function(index, datasetIndex) {
-			return +this.getRightValue(this.chart.data.datasets[datasetIndex].data[index]);
+			return +this.getRightValue(this.chart.data.datasets[datasetIndex].orig_data[index]);
 		},
 		// Utils
 		getPixelForValue: function(value) {
@@ -10989,6 +11013,15 @@ module.exports = function(Chart) {
 				}
 			}
 
+			if (layout) {
+				if (layout[me.chart.chart.canvas.id]) {
+					if (layout[me.chart.chart.canvas.id].normalized) {
+						me.min = 0;
+						me.max = 1;
+					}
+				}
+			}
+
 			if (tickOpts.min !== undefined) {
 				me.min = tickOpts.min;
 			} else if (tickOpts.suggestedMin !== undefined) {
@@ -11023,6 +11056,14 @@ module.exports = function(Chart) {
 			// the graph. Make sure we always have at least 2 ticks
 			var maxTicks = me.getTickLimit();
 			maxTicks = Math.max(2, maxTicks);
+			if (window.layout) {
+				if (window.layout[me.chart.chart.canvas.id]) {
+					var layout = window.layout[me.chart.chart.canvas.id];
+					if (layout.numticks) {
+						maxTicks = layout.numticks;
+					}
+				}
+			}
 
 			var numericGeneratorOptions = {
 				maxTicks: maxTicks,

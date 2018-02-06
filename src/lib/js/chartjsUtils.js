@@ -37,14 +37,15 @@
 
       return palette;
     }, // end of defineColorPalette
-    formatMeasure: function(value, layout, meas_num ) {
+    formatMeasure: function(value, layout, meas_num, force_pct) {
+      force_pct = force_pct || false;
       var decimal_separator = layout.decimal_separator;
       var thousand_separator = layout.thousand_separator;
 
       var qType = layout.qHyperCube.qMeasureInfo[meas_num].qNumFormat.qType; // Format type
 
       // When Autoformat is selected
-      if(layout.qHyperCube.qMeasureInfo[meas_num].qIsAutoFormat) {
+      if(layout.qHyperCube.qMeasureInfo[meas_num].qIsAutoFormat && !force_pct) {
         //return value;
         if(parseInt(value) > 999 || parseInt(value) < -999){
           return value.toString().replace(".", decimal_separator).replace(/\B(?=(\d{3})+(?!\d))/g, thousand_separator);
@@ -54,7 +55,7 @@
       }
 
       // When Number or Money is selected for format
-      if (qType == "F" || qType == "M" ) {
+      if (qType == "F" || qType == "M" || force_pct) {
         var qFmt = layout.qHyperCube.qMeasureInfo[meas_num].qNumFormat.qFmt; // Format string
         var digits = 0; //number of deciaml digits
         var prefix = "";
@@ -65,8 +66,9 @@
         } else { digits = 0; }
 
         //If percentage is selected
-        if(qFmt.substr(qFmt.length - 1,1) == "%") {
+        if(qFmt.substr(qFmt.length - 1,1) == "%" || force_pct) {
           if(digits>0){--digits}
+          if(force_pct){ digits = 0; }
           return (value * 100).toFixed(digits).toString().replace(".", decimal_separator).replace(/\B(?=(\d{3})+(?!\d))/g, thousand_separator) + "%"
         }
 

@@ -85,7 +85,7 @@ function ($, _, props, initProps, extensionUtils, cssContent, contents, Chart) {
     							return d.id === layout.chart
     						})[0].src;
 
-    						var url = base + "/qlik-sense-chartjs/lib/js/" + src;
+    						var url = base + "/qlik-sense-chartjs_EPA/lib/js/" + src;
 
     						// Load in the appropriate script and viz
     						jQuery.getScript(url, function() {

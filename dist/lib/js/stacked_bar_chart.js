@@ -51,6 +51,15 @@ var visualize = function($element, layout, _this, chartjsUtils) {
     formatted_data_array = chartjsUtils.addCumulativeValuesOnTwoDimensions(dim2_unique_values, formatted_data_array);
   }
 
+  var dim1_totals = Array.apply(null,{length: formatted_data_array[dim2_unique_values[0]].length}).map(function() { return 0; });
+  if (layout.normalized) {
+    for (var i=0; i<dim2_unique_values.length; i++ ) {
+      for (var j=0; j<dim1_totals.length; j++) {
+        dim1_totals[j] += formatted_data_array[dim2_unique_values[i]][j];
+      }
+    }
+  }
+
   // Create datasets for Chart.js rendering
   var datasets = [];
   for(var i=0; i<dim2_unique_values.length; i++ ) {
@@ -66,6 +75,10 @@ var visualize = function($element, layout, _this, chartjsUtils) {
     subdata.label = dim2_unique_values[i];
     subdata.backgroundColor = "rgba(" + palette[color_id] + "," + layout.opacity + ")";
     subdata.data = formatted_data_array[dim2_unique_values[i]];
+    subdata.orig_data = subdata.data;
+    if (layout.normalized) {
+      subdata.data = formatted_data_array[dim2_unique_values[i]].map(function(ele, idx) { return ele/dim1_totals[idx]; })
+    }
     datasets.push(subdata);
   }
 
@@ -118,6 +131,9 @@ var visualize = function($element, layout, _this, chartjsUtils) {
                   ticks: {
                     beginAtZero: layout.begin_at_zero_switch,
                     callback: function(value, index, values) {
+                      if (layout.normalized) {
+                        return chartjsUtils.formatMeasure(value, layout, 0, true);
+                      }
                       return chartjsUtils.formatMeasure(value, layout, 0);
                     }
                   }
@@ -128,7 +144,7 @@ var visualize = function($element, layout, _this, chartjsUtils) {
               callbacks: {
                   label: function(tooltipItems, data) {
                       if ((layout.hidezero && tooltipItems.yLabel > 0) || !layout.hidezero) {
-                        if (layout.normalized) {
+                        if (layout.tooltippct) {
                           return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0) + ' (' + (100*tooltipItems.yLabel/tooltipItems.yTotal).toFixed(1) + '%)';
                         } else {
                           return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
