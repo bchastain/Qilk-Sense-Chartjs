@@ -88,79 +88,82 @@ var visualize = function($element, layout, _this, chartjsUtils) {
   };
 
   var ctx = document.getElementById(id);
-  var myStackedBar = new Chart(ctx, {
-      type: 'bar',
-      data: chart_data,
-      options: {
-          title:{
-              display: layout.title_switch,
-              text: layout.title
-          },
-          legend: {
-            display: (layout.legend_position == "hide") ? false : true,
-            position: layout.legend_position,
-            onClick: function(evt, legendItem) {
-              var values = [];
-              var dim = 1;
-              if(dim2_unique_elem_nums[legendItem.text]<0) {
-                //do nothing
-              } else {
-                values.push(dim2_unique_elem_nums[legendItem.text]);
-                _this.selectValues(dim, values, true);
-              }
-            }
-          },
-          tooltips: {
-              mode: 'label'
-          },
-          responsive: true,
-          scales: {
-              xAxes: [{
-                  stacked: true,
-                  scaleLabel: {
-                    display: layout.datalabel_switch,
-                    labelString: layout.qHyperCube.qDimensionInfo[0].qFallbackTitle
-                  }
-              }],
-              yAxes: [{
-                  stacked: true,
-                  scaleLabel: {
-                    display: layout.datalabel_switch,
-                    labelString: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle
-                  },
-                  ticks: {
-                    beginAtZero: layout.begin_at_zero_switch,
-                    callback: function(value, index, values) {
-                      if (layout.normalized) {
-                        return chartjsUtils.formatMeasure(value, layout, 0, true);
-                      }
-                      return chartjsUtils.formatMeasure(value, layout, 0);
-                    }
-                  }
-              }]
-          },
-          tooltips: {
-              mode: 'label',
-              callbacks: {
-                  label: function(tooltipItems, data) {
-                      if ((layout.hidezero && tooltipItems.yLabel > 0) || !layout.hidezero) {
-                        if (layout.tooltippct) {
-                          return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0) + ' (' + (100*tooltipItems.yLabel/tooltipItems.yTotal).toFixed(1) + '%)';
-                        } else {
-                          return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
-                        }
-                        
-                      }
-                  }
-              }
-          },
-          events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
-          onClick: function(evt) {
-            var activePoints = this.getElementsAtEvent(evt);
-            if(activePoints.length > 0) {
-              chartjsUtils.makeSelectionsOnDataPoints(formatted_data_array["dim1_elem"][activePoints[0]._index], _this);
-            }
-          }
-      }
-  });
+  if (ctx) {
+	  
+	  var myStackedBar = new Chart(ctx, {
+		  type: 'bar',
+		  data: chart_data,
+		  options: {
+			  title:{
+				  display: layout.title_switch,
+				  text: layout.title
+			  },
+			  legend: {
+				display: (layout.legend_position == "hide") ? false : true,
+				position: layout.legend_position,
+				onClick: function(evt, legendItem) {
+				  var values = [];
+				  var dim = 1;
+				  if(dim2_unique_elem_nums[legendItem.text]<0) {
+					//do nothing
+				  } else {
+					values.push(dim2_unique_elem_nums[legendItem.text]);
+					_this.selectValues(dim, values, true);
+				  }
+				}
+			  },
+			  tooltips: {
+				  mode: 'label'
+			  },
+			  responsive: true,
+			  scales: {
+				  xAxes: [{
+					  stacked: true,
+					  scaleLabel: {
+						display: layout.datalabel_switch,
+						labelString: layout.qHyperCube.qDimensionInfo[0].qFallbackTitle
+					  }
+				  }],
+				  yAxes: [{
+					  stacked: true,
+					  scaleLabel: {
+						display: layout.datalabel_switch,
+						labelString: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle
+					  },
+					  ticks: {
+						beginAtZero: layout.begin_at_zero_switch,
+						callback: function(value, index, values) {
+						  if (layout.normalized) {
+							return chartjsUtils.formatMeasure(value, layout, 0, true);
+						  }
+						  return chartjsUtils.formatMeasure(value, layout, 0);
+						}
+					  }
+				  }]
+			  },
+			  tooltips: {
+				  mode: 'label',
+				  callbacks: {
+					  label: function(tooltipItems, data) {
+						  if ((layout.hidezero && tooltipItems.yLabel > 0) || !layout.hidezero) {
+							if (layout.tooltippct) {
+							  return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0) + ' (' + (100*tooltipItems.yLabel/tooltipItems.yTotal).toFixed(1) + '%)';
+							} else {
+							  return data.datasets[tooltipItems.datasetIndex].label +': ' + chartjsUtils.formatMeasure(tooltipItems.yLabel, layout, 0);
+							}
+							
+						  }
+					  }
+				  }
+			  },
+			  events: ["mousemove", "mouseout", "click", "touchstart", "touchmove", "touchend"],
+			  onClick: function(evt) {
+				var activePoints = this.getElementsAtEvent(evt);
+				if(activePoints.length > 0) {
+				  chartjsUtils.makeSelectionsOnDataPoints(formatted_data_array["dim1_elem"][activePoints[0]._index], _this);
+				}
+			  }
+		  }
+	  });
+  }
 }

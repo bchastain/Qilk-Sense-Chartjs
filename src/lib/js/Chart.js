@@ -5754,16 +5754,19 @@ module.exports = function(Chart) {
 	function getConstraintDimension(domNode, maxStyle, percentageProperty) {
 		var view = document.defaultView;
 		var parentNode = domNode.parentNode;
-		var constrainedNode = view.getComputedStyle(domNode)[maxStyle];
-		var constrainedContainer = view.getComputedStyle(parentNode)[maxStyle];
-		var hasCNode = isConstrainedValue(constrainedNode);
-		var hasCContainer = isConstrainedValue(constrainedContainer);
-		var infinity = Number.POSITIVE_INFINITY;
+		if (parentNode) {
+				
+			var constrainedNode = view.getComputedStyle(domNode)[maxStyle];
+			var constrainedContainer = view.getComputedStyle(parentNode)[maxStyle];
+			var hasCNode = isConstrainedValue(constrainedNode);
+			var hasCContainer = isConstrainedValue(constrainedContainer);
+			var infinity = Number.POSITIVE_INFINITY;
 
-		if (hasCNode || hasCContainer) {
-			return Math.min(
-				hasCNode? parseMaxStyle(constrainedNode, domNode, percentageProperty) : infinity,
-				hasCContainer? parseMaxStyle(constrainedContainer, parentNode, percentageProperty) : infinity);
+			if (hasCNode || hasCContainer) {
+				return Math.min(
+					hasCNode? parseMaxStyle(constrainedNode, domNode, percentageProperty) : infinity,
+					hasCContainer? parseMaxStyle(constrainedContainer, parentNode, percentageProperty) : infinity);
+			}
 		}
 
 		return 'none';
@@ -5778,19 +5781,25 @@ module.exports = function(Chart) {
 	};
 	helpers.getMaximumWidth = function(domNode) {
 		var container = domNode.parentNode;
-		var paddingLeft = parseInt(helpers.getStyle(container, 'padding-left'), 10);
-		var paddingRight = parseInt(helpers.getStyle(container, 'padding-right'), 10);
-		var w = container.clientWidth - paddingLeft - paddingRight;
-		var cw = helpers.getConstraintWidth(domNode);
-		return isNaN(cw)? w : Math.min(w, cw);
+		if (container) {
+			var paddingLeft = parseInt(helpers.getStyle(container, 'padding-left'), 10);
+			var paddingRight = parseInt(helpers.getStyle(container, 'padding-right'), 10);
+			var w = container.clientWidth - paddingLeft - paddingRight;
+			var cw = helpers.getConstraintWidth(domNode);
+			return isNaN(cw)? w : Math.min(w, cw);
+		}
+		return helpers.getConstraintWidth(domNode);
 	};
 	helpers.getMaximumHeight = function(domNode) {
 		var container = domNode.parentNode;
-		var paddingTop = parseInt(helpers.getStyle(container, 'padding-top'), 10);
-		var paddingBottom = parseInt(helpers.getStyle(container, 'padding-bottom'), 10);
-		var h = container.clientHeight - paddingTop - paddingBottom;
-		var ch = helpers.getConstraintHeight(domNode);
-		return isNaN(ch)? h : Math.min(h, ch);
+		if (container) {
+			var paddingTop = parseInt(helpers.getStyle(container, 'padding-top'), 10);
+			var paddingBottom = parseInt(helpers.getStyle(container, 'padding-bottom'), 10);
+			var h = container.clientHeight - paddingTop - paddingBottom;
+			var ch = helpers.getConstraintHeight(domNode);
+			return isNaN(ch)? h : Math.min(h, ch);
+		}
+		return helpers.getConstraintHeight(domNode);
 	};
 	helpers.getStyle = function(el, property) {
 		return el.currentStyle ?
@@ -10498,26 +10507,28 @@ module.exports = function(Chart) {
 
 	return {
 		acquireContext: function(item, config) {
-			if (typeof item === 'string') {
-				item = document.getElementById(item);
-			} else if (item.length) {
-				// Support for array based queries (such as jQuery)
-				item = item[0];
-			}
+			if (item) {
+				if (typeof item === 'string') {
+					item = document.getElementById(item);
+				} else if (item.length) {
+					// Support for array based queries (such as jQuery)
+					item = item[0];
+				}
 
-			if (item && item.canvas) {
-				// Support for any object associated to a canvas (including a context2d)
-				item = item.canvas;
-			}
+				if (item && item.canvas) {
+					// Support for any object associated to a canvas (including a context2d)
+					item = item.canvas;
+				}
 
-			if (item instanceof HTMLCanvasElement) {
-				// To prevent canvas fingerprinting, some add-ons undefine the getContext
-				// method, for example: https://github.com/kkapsner/CanvasBlocker
-				// https://github.com/chartjs/Chart.js/issues/2807
-				var context = item.getContext && item.getContext('2d');
-				if (context instanceof CanvasRenderingContext2D) {
-					initCanvas(item, config);
-					return context;
+				if (item instanceof HTMLCanvasElement) {
+					// To prevent canvas fingerprinting, some add-ons undefine the getContext
+					// method, for example: https://github.com/kkapsner/CanvasBlocker
+					// https://github.com/chartjs/Chart.js/issues/2807
+					var context = item.getContext && item.getContext('2d');
+					if (context instanceof CanvasRenderingContext2D) {
+						initCanvas(item, config);
+						return context;
+					}
 				}
 			}
 
