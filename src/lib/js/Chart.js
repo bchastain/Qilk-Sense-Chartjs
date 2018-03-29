@@ -8109,7 +8109,7 @@ module.exports = function(Chart) {
 				}
 
 				if ((longestRotatedLabel + optionTicks.autoSkipPadding) * me.ticks.length > (me.width - (me.paddingLeft + me.paddingRight))) {
-					skipRatio = 1 + Math.floor(((longestRotatedLabel + optionTicks.autoSkipPadding) * me.ticks.length) / (me.width - (me.paddingLeft + me.paddingRight)));
+					//skipRatio = 1 + Math.floor(((longestRotatedLabel + optionTicks.autoSkipPadding) * me.ticks.length) / (me.width - (me.paddingLeft + me.paddingRight)));
 				}
 
 				// if they defined a max number of optionTicks,
@@ -11938,7 +11938,7 @@ module.exports = function(Chart) {
 			}
 		},
 		ticks: {
-			autoSkip: false
+			autoSkip: true
 		}
 	};
 

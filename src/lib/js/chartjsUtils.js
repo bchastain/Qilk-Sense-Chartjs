@@ -119,12 +119,13 @@
     makeSelectionsOnDataPoints: function(selectedElemNumber, _this) {
       var values = [];
       var dim = 0;
-      if(selectedElemNumber < 0) {
+      //Commenting this out - hope it doesn't break anything!
+      //if(selectedElemNumber < 0) {
         //do nothing
-      } else {
+      //} else {
         values.push(selectedElemNumber);
         _this.selectValues(dim, values, true)
-      }
+      //}
     }, //end of makeSelectionsOnDataPoints
     initializeArrayWithZero: function(dim1_length, dim2_unique_values, result) {
       // Initialize arrays for dimension values

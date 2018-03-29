@@ -143,7 +143,7 @@ define([
                   value: 10,
                   label: "Narrow"
                 }, {
-                  value: 20,
+                  value: 60,
                   label: "Very Narrow"
                 }],
                 defaultValue:10,
