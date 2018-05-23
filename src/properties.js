@@ -7,7 +7,156 @@ define([
 
     var dimensions = {
         uses: "dimensions",
-        min: 0
+        min: 0,
+            items: {
+              colorSectionText:{
+                type:"string",
+                component:"text",
+                label:" "
+              },
+              colorSwitch:{
+                type: "boolean",
+                component: "switch",
+                label: "Colors",
+                ref:"qDef.myColorSelection.auto",
+                options: [
+                  {
+                                      value: true,
+                                      label: "Auto"
+                                  }, {
+                                      value: false,
+                                        label: "Custom"
+                                    }
+                                ], 
+                                defaultValue: true
+              },
+              colorChoice:{
+                type:"string",
+                component:"dropdown",
+                label:"",
+                ref:"qDef.myColorSelection.choice",
+                options: [
+                  {label: "Random", value:"random"},
+                  {label: "Single color", value:"single"},
+                  {label: "By expression", value:"expression"}
+                ],
+                show : function(layout) {
+                  if (typeof layout === 'object'){
+                    if (typeof layout.qDef.myColorSelection === 'object' && typeof layout.qDef.myColorSelection.auto !== 'undefined'){
+                      return !layout.qDef.myColorSelection.auto;
+                    } else { 
+                      return false;
+                    }
+                  } else {
+                    return false;
+                  }
+                } 
+              },
+              // the following two objects are moved from the "Sankey Settings" section to here.
+              colorPalette:{
+                type:"string",
+                component: "dropdown",
+                label : "Palette",
+                ref:"qDef.myColorSelection.displayPalette",
+                options:
+                [
+                  {
+                    value: "D3-20",
+                    label: "Ordinal Palette 20 colors"
+                  },
+                  {
+                    value: "D3-20c",
+                    label: "Blue-Grey Palette 20 colors"
+                  },
+                  {
+                    value: "D3-20b",
+                    label: "Blue-Purple Palette 20 colors"
+                  },
+                  {
+                    value: "20",
+                    label: "Palette 20 colors"
+                  },
+                  {
+                    value: "20a",
+                    label: "Other Palette 20 colors"
+                  }
+                ],
+                defaultValue: "D3-20",
+                show : function(layout) {
+                  if (typeof layout === 'object'){
+                    if (typeof layout.qDef.myColorSelection === 'object' && typeof layout.qDef.myColorSelection.choice !== 'undefined'){
+                      return !layout.qDef.myColorSelection.auto && layout.qDef.myColorSelection.choice === 'random';
+                    } else { 
+                      return false;
+                    }
+                  } else {
+                    return false;
+                  }
+                }
+              },
+              colorPersistence:{
+                ref: "qDef.myColorSelection.colorPersistence",
+                component: "switch",
+                type: "boolean",
+                translation: "Persistence",
+                defaultValue: false,
+                trueOption: {
+                  value: true,
+                  translation: "properties.on"
+                },
+                falseOption: {
+                  value: false,
+                  translation: "properties.off"
+                },
+                show : function(layout) {
+                  if (typeof layout === 'object'){
+                    if (typeof layout.qDef.myColorSelection === 'object' && typeof layout.qDef.myColorSelection.choice !== 'undefined'){
+                      return !layout.qDef.myColorSelection.auto && layout.qDef.myColorSelection.choice === 'random';
+                    } else { 
+                      return false;
+                    }
+                  } else {
+                    return false;
+                  }
+                }
+              },
+              colorSingle:{
+                type: "integer",
+                component: "color-picker",
+                label: "Color",
+                ref: "qDef.myColorSelection.single",
+                dualOutput: true,
+                defaultValue: 1,
+                show : function(layout) {
+                  if (typeof layout === 'object'){
+                    if (typeof layout.qDef.myColorSelection === 'object' && typeof layout.qDef.myColorSelection.choice !== 'undefined'){
+                      return !layout.qDef.myColorSelection.auto && layout.qDef.myColorSelection.choice === 'single';
+                    } else { 
+                      return false;
+                    }
+                  } else {
+                    return false;
+                  }
+                }
+              },
+              colorExpression:{
+                type: "string",
+                label: "Enter color expression",
+                ref: "qAttributeExpressions.0.qExpression",
+                component: "expression",
+                show : function(layout) {
+                  if (typeof layout === 'object'){
+                    if (typeof layout.qDef.myColorSelection === 'object' && typeof layout.qDef.myColorSelection.choice !== 'undefined'){
+                      return !layout.qDef.myColorSelection.auto && layout.qDef.myColorSelection.choice === 'expression';
+                    } else { 
+                      return false;
+                    }
+                  } else {
+                    return false;
+                  }
+                }
+              }
+            }
     };
 
     var measures = {

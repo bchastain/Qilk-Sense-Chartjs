@@ -142,6 +142,9 @@ define([
                 }, {
                   value: 10,
                   label: "Narrow"
+                }, {
+                  value: 60,
+                  label: "Very Narrow"
                 }],
                 defaultValue:10,
                 show: function(data) { 

@@ -1,9 +1,9 @@
 {
 	"name" : "Qlik-Sense-Chartjs_EPA",
-	"description" : "Qlik Sense Extension using Chart.js(http://www.chartjs.org/).",
+	"description" : "Qlik Sense Extension using Chart.js(http://www.chartjs.org/) customized for EPA.",
 	"icon" : "extension",
 	"type" : "visualization",
-	"version": "0.1.0",
+	"version": "0.1.3",
 	"preview" : "./lib/images/chartjs.png",
-	"author": "Masaki Hamano"
+	"author": "Bryan Chastain"
 }
