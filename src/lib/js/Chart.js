@@ -38,8 +38,8 @@ function getRgba(string) {
    }
    var abbr =  /^#([a-fA-F0-9]{3})$/,
        hex =  /^#([a-fA-F0-9]{6})$/,
-       rgba = /^rgba?\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/,
-       per = /^rgba?\(\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/,
+       rgba = /^rgba?\(\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*,\s*([+-]?\d+)\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/i,
+       per = /^rgba?\(\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*,\s*([+-]?[\d\.]+)\%\s*(?:,\s*([+-]?[\d\.]+)\s*)?\)$/i,
        keyword = /(\w+)/;
 
    var rgb = [0, 0, 0],
@@ -1974,7 +1974,6 @@ module.exports = function(Chart) {
 						base += value < 0 ? Math.min(currentVal, original) : Math.max(currentVal, original);
 					}
 				}
-
 				return yScale.getPixelForValue(base);
 			}
 
@@ -6074,6 +6073,14 @@ module.exports = function(Chart) {
 
 		if (!items.length) {
 			return [];
+		}
+		if (window.layout) {
+			if (window.layout[chart.chart.canvas.id]) {
+				var layout = window.layout[chart.chart.canvas.id];
+				if (layout.selectdim2) {
+					return items;
+				}
+			}
 		}
 
 		chart.data.datasets.forEach(function(dataset, datasetIndex) {
@@ -11023,7 +11030,7 @@ module.exports = function(Chart) {
 				}
 			}
 
-			if (layout) {
+			if (typeof layout !== 'undefined') {
 				if (layout[me.chart.chart.canvas.id]) {
 					if (layout[me.chart.chart.canvas.id].normalized) {
 						me.min = 0;

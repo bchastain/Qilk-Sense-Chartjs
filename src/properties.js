@@ -203,7 +203,7 @@ define([
                   { value: true, label: "Nearest to Cursor"}
                 ],
                 show: function(data) { 
-                  return (data.qHyperCubeDef.qDimensions.length > 1
+                  return (data.qHyperCubeDef.qDimensions.length >= 1
                     || (data.qHyperCubeDef.qDimensions.length == 1 
                         && data.qHyperCubeDef.qMeasures.length > 1
                   )); 
@@ -226,6 +226,20 @@ define([
                   )); 
                 }
               },
+              selectdim2: {
+                type: "boolean",
+                component: "switch",
+                label: "Select by Dim2",
+                ref: "selectdim2",
+                defaultValue: false,
+                options: [
+                  { value: false, label: "Select by Dim1"},
+                  { value: true, label: "Select by Dim2"}
+                ],
+                show: function(data) { 
+                  return (data.qHyperCubeDef.qDimensions.length > 1); 
+                }
+              },
               showgridlines: {
                 type: "boolean",
                 component: "switch",
@@ -237,7 +251,7 @@ define([
                   { value: true, label: "Yes"}
                 ],
                 show: function(data) { 
-                  return (data.qHyperCubeDef.qDimensions.length > 1
+                  return (data.qHyperCubeDef.qDimensions.length >= 1
                     || (data.qHyperCubeDef.qDimensions.length == 1 
                         && data.qHyperCubeDef.qMeasures.length > 1
                   )); 
@@ -297,7 +311,7 @@ define([
                 }],
                 defaultValue:10,
                 show: function(data) { 
-                  return (data.qHyperCubeDef.qDimensions.length > 1
+                  return (data.qHyperCubeDef.qDimensions.length >= 1
                     || (data.qHyperCubeDef.qDimensions.length == 1 
                         && data.qHyperCubeDef.qMeasures.length > 1
                   )); 

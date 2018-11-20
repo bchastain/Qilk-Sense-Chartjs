@@ -3,7 +3,7 @@
 	"description" : "Qlik Sense Extension using Chart.js(http://www.chartjs.org/) customized for EPA.",
 	"icon" : "extension",
 	"type" : "visualization",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"preview" : "./lib/images/chartjs.png",
 	"author": "Bryan Chastain"
 }

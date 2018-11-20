@@ -180,7 +180,7 @@ var visualize = function($element, layout, _this, chartjsUtils) {
     }
     datasets.push(subdata);
   }
-
+  datasets = datasets.reverse();
   var chart_data = {
       labels: formatted_data_array["dim1"],
       datasets: datasets
@@ -259,7 +259,11 @@ var visualize = function($element, layout, _this, chartjsUtils) {
 			  onClick: function(evt) {
 				var activePoints = this.getElementsAtEvent(evt);
 				if(activePoints.length > 0) {
-				  chartjsUtils.makeSelectionsOnDataPoints(formatted_data_array["dim1_elem"][activePoints[0]._index], _this);
+					if(layout.selectdim2) {
+				  		chartjsUtils.makeSelectionsOnDataPoints(dim2_unique_elem_nums[activePoints[0]._view.datasetLabel], _this);
+					} else {
+				 		chartjsUtils.makeSelectionsOnDataPoints(formatted_data_array["dim1_elem"][activePoints[0]._index], _this);
+					}
 				}
 			  }
 		  }

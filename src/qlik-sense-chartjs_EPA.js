@@ -79,6 +79,41 @@ function ($, _, props, initProps, extensionUtils, cssContent, contents, Chart) {
     					})[0].measures + " measures.");
     				} else {
 
+
+
+
+                      self.backendApi.cacheCube.enabled = false;
+
+
+                      var qTotalData = [];
+                      var columns = layout.qHyperCube.qSize.qcx;
+                      var pageheight = Math.floor(10000 / columns);
+                      // Maximum of 10000 cells at one time, so break it up into pages
+                      var numberOfPages = Math.ceil(layout.qHyperCube.qSize.qcy / pageheight);
+                      var ctr = 0;
+
+                      // Loop through the pages and offset each page by the prescribed
+                      // amount. Call getData() on each
+                      Array.apply(null, Array(numberOfPages)).map(function(data, index) {
+                        var page = [{
+                          qTop: (pageheight * index) + index,
+                          qLeft: 0,
+                          qWidth: columns,
+                          qHeight: pageheight
+                        }];
+
+                        return self.backendApi.getData(page).then(function(data2) {
+                          // Push this page's matrix into the combined matrix
+                          for (var k = 0; k < data2[0].qMatrix.length; k++) {
+                            qTotalData.push(data2[0].qMatrix[k])
+                          }
+                          ctr++;
+                          // If reached the last page, call viz
+                          if (ctr == numberOfPages) {
+                            // Set combined matrix as default
+                            layout.qHyperCube.qDataPages[0].qMatrix = qTotalData;
+
+
               //if (layout.chart != lastUsedChart) {
     						// Determine URL based on chart selection
     						var src = chartjs.filter(function(d) {
@@ -95,6 +130,9 @@ function ($, _, props, initProps, extensionUtils, cssContent, contents, Chart) {
     					//} else {
     					//	viz($element, layout, self);
     					//}
+                          }
+                        });
+                    });
 
             }
         }

@@ -119,6 +119,13 @@
     makeSelectionsOnDataPoints: function(selectedElemNumber, _this) {
       var values = [];
       var dim = 0;
+
+      if (_this.$scope.$parent.layout) {
+        var layout = _this.$scope.$parent.layout;
+        if (layout.selectdim2) {
+          dim = 1;
+        }
+      }
       //Commenting this out - hope it doesn't break anything!
       //if(selectedElemNumber < 0) {
         //do nothing
@@ -141,10 +148,15 @@
     }, //end of initializeArrayWithZero
     storeHypercubeDataToArray: function(data_grouped_by_dim1, formatted_data_array) {
       var i = 0;
+      if(!("dim2_elem" in formatted_data_array)) {
+        formatted_data_array["dim2_elem"] = [];
+      }
       _.each(data_grouped_by_dim1, function(d) {
           formatted_data_array["dim1"][i] = d[0].dim1;
           formatted_data_array["dim1_elem"][i] = d[0].dim1_elem;
+          formatted_data_array["dim2_elem"][i] = [];
         _.each(d, function(dd){
+          formatted_data_array["dim2_elem"][i].push(dd.dim2_elem);
           formatted_data_array[dd.dim2][i] = dd.mea1;
         })
         i++;
@@ -164,6 +176,7 @@
           dim1: d[0].qText,
           dim1_elem: d[0].qElemNumber,
           dim2: d[1].qText,
+          dim2_elem: d[1].qElemNumber,
           mea1: d[2].qNum
         });
       })
